@@ -10,7 +10,7 @@
  */
 
 namespace Konekt\PdfInvoice;
-
+error_reporting(0);
 use FPDF;
 
 class InvoicePrinter extends FPDF
