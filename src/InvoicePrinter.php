@@ -10,7 +10,7 @@
  */
 
 namespace Konekt\PdfInvoice;
-error_reporting(0);
+
 use FPDF;
 
 class InvoicePrinter extends FPDF
@@ -394,10 +394,18 @@ class InvoicePrinter extends FPDF
         }
 
         //First page
-        if ($this->PageNo() == 1) {
-            if (($this->margins['t'] + $this->dimensions[1]) > $this->GetY()) {
-                $this->SetY($this->margins['t'] + $this->dimensions[1] + 5);
-            } else {
+        if ($this->PageNo() == 1)
+        {
+            @$dime = $this->dimensions[1];
+
+            $value = $dime + $this->margins['t'];
+
+            if ( $value > $this->GetY())
+            {
+                $newY = $this->margins['t'] + $this->dimensions[1] + 5;
+                $this->SetY($newY);
+            } else
+            {
                 $this->SetY($this->GetY() + 10);
             }
             $this->Ln(5);
@@ -407,19 +415,22 @@ class InvoicePrinter extends FPDF
             $this->SetDrawColor($this->color[0], $this->color[1], $this->color[2]);
             $this->SetFont($this->font, 'B', 10);
             $width = ($this->document['w'] - $this->margins['l'] - $this->margins['r']) / 2;
-            if (isset($this->flipflop)) {
-                $to                 = $this->lang['to'];
-                $from               = $this->lang['from'];
-                $this->lang['to']   = $from;
+            if (isset($this->flipflop))
+            {
+                $to = $this->lang['to'];
+                $from = $this->lang['from'];
+                $this->lang['to'] = $from;
                 $this->lang['from'] = $to;
-                $to                 = $this->to;
-                $from               = $this->from;
-                $this->to           = $from;
-                $this->from         = $to;
+                $to = $this->to;
+                $from = $this->from;
+                $this->to = $from;
+                $this->from = $to;
             }
 
-            if ($this->display_tofrom === true) {
-                if ($this->displayToFromHeaders === true) {
+            if ($this->display_tofrom === true)
+            {
+                if ($this->displayToFromHeaders === true)
+                {
                     $this->Cell($width, $lineheight, iconv(self::ICONV_CHARSET_INPUT, self::ICONV_CHARSET_OUTPUT_A, mb_strtoupper($this->lang['from'], self::ICONV_CHARSET_INPUT)), 0, 0, 'L');
                     $this->Cell(0, $lineheight, iconv(self::ICONV_CHARSET_INPUT, self::ICONV_CHARSET_OUTPUT_A, mb_strtoupper($this->lang['to'], self::ICONV_CHARSET_INPUT)), 0, 0, 'L');
                     $this->Ln(7);
@@ -427,7 +438,8 @@ class InvoicePrinter extends FPDF
                     $this->Line($this->margins['l'], $this->GetY(), $this->margins['l'] + $width - 10, $this->GetY());
                     $this->Line($this->margins['l'] + $width, $this->GetY(), $this->margins['l'] + $width + $width,
                         $this->GetY());
-                } else {
+                } else
+                {
                     $this->Ln(2);
                 }
 
@@ -435,14 +447,19 @@ class InvoicePrinter extends FPDF
                 $this->Ln(5);
                 $this->SetTextColor(50, 50, 50);
                 $this->SetFont($this->font, 'B', 10);
-                $this->Cell($width, $lineheight, $this->from[0], 0, 0, 'L');
-                $this->Cell(0, $lineheight, iconv(self::ICONV_CHARSET_INPUT, self::ICONV_CHARSET_OUTPUT_A, $this->to[0]), 0, 0, 'L');
+                //FIXME
+                @$this->Cell($width, $lineheight, $this->from[0], 0, 0, 'L');
+                //FIXME
+                @$this->Cell(0, $lineheight, iconv(self::ICONV_CHARSET_INPUT, self::ICONV_CHARSET_OUTPUT_A,
+                    $this->to[0]), 0, 0, 'L');
                 $this->SetFont($this->font, '', 8);
                 $this->SetTextColor(100, 100, 100);
                 $this->Ln(7);
-                for ($i = 1, $iMax = max($this->from === null ? 0 : count($this->from), $this->to === null ? 0 : count($this->to)); $i < $iMax; $i++) {
+                for ($i = 1, $iMax = max($this->from === null ? 0 : count($this->from), $this->to === null ? 0 : count($this->to)); $i < $iMax; $i++)
+                {
                     // check if the TO or FROM array value is not empty.
-                    if($this->to[$i] !== ""){
+                    if (!empty($this->to[$i]))
+                    {
                         $this->Cell($width, $lineheight, iconv(self::ICONV_CHARSET_INPUT, self::ICONV_CHARSET_OUTPUT_A, $this->from[$i]), 0, 0, 'L');
                         $this->Cell(0, $lineheight, iconv(self::ICONV_CHARSET_INPUT, self::ICONV_CHARSET_OUTPUT_A, $this->to[$i]), 0, 0, 'L');
                         $this->Ln(5);
@@ -450,7 +467,8 @@ class InvoicePrinter extends FPDF
                 }
                 $this->Ln(-6);
                 $this->Ln(5);
-            } else {
+            } else
+            {
                 $this->Ln(-10);
             }
         }
@@ -707,3 +725,4 @@ class InvoicePrinter extends FPDF
             $this->columns += 1;
     }
 }
+
